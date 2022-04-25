@@ -1,4 +1,4 @@
-#%undefine _missing_build_ids_terminate_build
+%undefine _missing_build_ids_terminate_build
 %global mysql_vendor Oracle and/or its affiliates
 %global greatsql_vendor GreatDB Software Co., Ltd.
 %global mysqldatadir /var/lib/mysql
@@ -88,16 +88,6 @@
 # multiarch
 %global multiarchs            ppc %{power64} %{ix86} x86_64 %{sparc}
 
-# Hack to support el5 where __isa_bits not defined. Note: supports i386 and x86_64 only, sorry.
-%if x%{?__isa_bits} == x
-%ifarch %{ix86}
-%global __isa_bits            32
-%endif
-%ifarch x86_64
-%global __isa_bits            64
-%endif
-%endif
-
 %global src_dir               %{src_base}-%{mysql_version}-%{greatsql_version}
 
 # We build debuginfo package so this is not used
@@ -155,27 +145,9 @@ BuildRequires:  pkgconfig(systemd)
 %endif
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  openldap-devel
-#%if 0%{?rhel} == 8
-#BuildRequires:  cmake >= 3.6.1
-##BuildRequires:  gcc
-##BuildRequires:  gcc-c++
-#BuildRequires:  gcc-toolset-10-gcc
-#BuildRequires:  gcc-toolset-10-gcc-c++
-#BuildRequires:  libtirpc-devel
-##BuildRequires:  rpcgen
-#%endif
-#%if 0%{?rhel} == 7
-#BuildRequires:  cmake3 >= 3.6.1
-#BuildRequires:  devtoolset-10-gcc
-#BuildRequires:  devtoolset-10-gcc-c++
-#%endif
-#%if 0%{?rhel} == 6
-#BuildRequires:  cmake3 >= 3.6.1
-#BuildRequires:  devtoolset-8-gcc
-#BuildRequires:  devtoolset-8-gcc-c++
-#%endif
 
-BuildRequires:  libtirpc-devel m4 libaio-devel libevent-devel lz4-devel 
+
+BuildRequires:  cmake gcc gcc-c++ rpcgen libtirpc-devel m4 libaio-devel libevent-devel lz4-devel 
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -395,22 +367,6 @@ if [ "x$(id -u)" = "x0" ] ; then
 fi
 %endif
 
-# Download compat libs
-#%if 0%{?compatlib}
-#(
-#  rm -rf percona-compatlib
-#  mkdir percona-compatlib
-#  pushd percona-compatlib
-#  wget %{compatsrc}
-#%if 0%{?rhel} > 6
-#  rpm2cpio Percona-Server-shared-%{compat_prefix}-%{compatver}-rel%{percona_compatver}.el7.x86_64.rpm | cpio --extract --make-directories --verbose
-#%else
-#  rpm2cpio Percona-Server-shared-%{compat_prefix}-%{compatver}-rel%{percona_compatver}.624.rhel6.x86_64.rpm | cpio --extract --make-directories --verbose
-#%endif # 0%{?rhel} > 6
-#  popd
-#)
-#%endif # 0%{?compatlib}
-
 # Build debug versions of mysqld and libmysqld.a
 mkdir debug
 (
@@ -507,7 +463,6 @@ mkdir release
 )
 
 %install
-%define _unpackaged_files_terminate_build 0
 #%if 0%{?compatlib}
 #  # Install compat libs
 #  %if 0%{?rhel} > 6
@@ -1270,5 +1225,5 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
 %changelog
-* Fri Apr 22 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15
+* Mon Apr 25 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15
 - Release GreatSQL-8.0.25-15 for openEuler
