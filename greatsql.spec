@@ -87,10 +87,11 @@ SOURCE103:      greatsql-8.0.25-15.tar.gz.ac
 SOURCE104:      greatsql-8.0.25-15.tar.gz.ad
 SOURCE105:      greatsql-8.0.25-15.tar.gz.ae
 SOURCE106:      greatsql-8.0.25-15.tar.gz.af
-SOURCE107:      greatsql-8.0.25-15.tar.gz.ah
-SOURCE108:      greatsql-8.0.25-15.tar.gz.ai
-SOURCE109:      greatsql-8.0.25-15.tar.gz.aj
-SOURCE110:      greatsql-8.0.25-15.tar.gz.ak
+SOURCE107:      greatsql-8.0.25-15.tar.gz.ag
+SOURCE108:      greatsql-8.0.25-15.tar.gz.ah
+SOURCE109:      greatsql-8.0.25-15.tar.gz.ai
+SOURCE110:      greatsql-8.0.25-15.tar.gz.aj
+SOURCE111:      greatsql-8.0.25-15.tar.gz.ak
 URL:            https://gitee.com/GreatSQL/GreatSQL
 SOURCE5:        mysql_config.sh
 SOURCE10:       boost_1_73_0.tar.gz
@@ -361,7 +362,7 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 
 %prep
 cat %{SOURCE201} %{SOURCE202} %{SOURCE203} > %{SOURCE10}
-cat %{SOURCE101} %{SOURCE102} %{SOURCE103} %{SOURCE104} %{SOURCE105} %{SOURCE106} %{SOURCE107} %{SOURCE108} %{SOURCE109} %{SOURCE110} > %{SOURCE0}
+cat %{SOURCE101} %{SOURCE102} %{SOURCE103} %{SOURCE104} %{SOURCE105} %{SOURCE106} %{SOURCE107} %{SOURCE108} %{SOURCE109} %{SOURCE110} %{SOURCE111} > %{SOURCE0}
 %setup -q -T -a 0 -a 10 -c -n %{src_dir}
 pushd %{src_dir}
 %patch0 -p0
