@@ -11,8 +11,6 @@
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
-%global _smp_mflags -j16
-
 # By default, a build will be done using the system SSL library
 %{?with_ssl: %global ssl_option -DWITH_SSL=%{with_ssl}}
 %{!?with_ssl: %global ssl_option -DWITH_SSL=system}
@@ -21,7 +19,7 @@
 %{!?with_tokudb: %global tokudb 0}
 
 # By default a build will be done including the RocksDB
-%{!?with_rocksdb: %global rocksdb 0}
+%{!?with_rocksdb: %global rocksdb 1}
 
 # Pass path to mecab lib
 %{?with_mecab: %global mecab_option -DWITH_MECAB=%{with_mecab}}
@@ -30,9 +28,7 @@
 # Regression tests may take a long time, override the default to skip them
 %{!?runselftest:%global runselftest 0}
 
-%{!?with_systemd:                %global systemd 0}
-%{?el7:                          %global systemd 1}
-%{?el8:                          %global systemd 1}
+%global systemd 1
 %{!?with_debuginfo:              %global nodebuginfo 0}
 %{!?product_suffix:              %global product_suffix -80}
 %{!?feature_set:                 %global feature_set community}
@@ -41,15 +37,15 @@
 %{!?src_base:                    %global src_base greatsql}
 
 # Setup cmake flags for TokuDB
-#%if 0%{?tokudb}
-#  %global TOKUDB_FLAGS -DWITH_VALGRIND=OFF -DUSE_VALGRIND=OFF -DDEBUG_EXTNAME=OFF -DBUILD_TESTING=OFF -DUSE_GTAGS=OFF -DUSE_CTAGS=OFF -DUSE_ETAGS=OFF -DUSE_CSCOPE=OFF -DTOKUDB_BACKUP_PLUGIN_VERSION=%{tokudb_backup_version}
-#  %global TOKUDB_DEBUG_ON -DTOKU_DEBUG_PARANOID=ON
-#  %global TOKUDB_DEBUG_OFF -DTOKU_DEBUG_PARANOID=OFF
-#%else
-#  %global TOKUDB_FLAGS -DWITHOUT_TOKUDB=1
-#  %global TOKUDB_DEBUG_ON %{nil}
-#  %global TOKUDB_DEBUG_OFF %{nil}
-#%endif
+%if 0%{?tokudb}
+  %global TOKUDB_FLAGS -DWITH_VALGRIND=OFF -DUSE_VALGRIND=OFF -DDEBUG_EXTNAME=OFF -DBUILD_TESTING=OFF -DUSE_GTAGS=OFF -DUSE_CTAGS=OFF -DUSE_ETAGS=OFF -DUSE_CSCOPE=OFF -DTOKUDB_BACKUP_PLUGIN_VERSION=%{tokudb_backup_version}
+  %global TOKUDB_DEBUG_ON -DTOKU_DEBUG_PARANOID=ON
+  %global TOKUDB_DEBUG_OFF -DTOKU_DEBUG_PARANOID=OFF
+%else
+  %global TOKUDB_FLAGS -DWITHOUT_TOKUDB=1
+  %global TOKUDB_DEBUG_ON %{nil}
+  %global TOKUDB_DEBUG_OFF %{nil}
+%endif
 
 # Setup cmake flags for RocksDB
 %if 0%{?rocksdb}
@@ -59,34 +55,12 @@
 %endif
 
 # On rhel 5/6 we still have renamed library to libperconaserverclient
-%if 0%{?rhel} > 6
-  %global shared_lib_pri_name mysqlclient
-  %global shared_lib_sec_name perconaserverclient
-%else
-  %global shared_lib_pri_name mysqlclient
-  %global shared_lib_sec_name perconaserverclient
-%endif
 
-%global compatlib             18
-# Version for compat libs
-#%if 0%{?rhel} > 6
-#%global compat_prefix         56
-#%global compatver             5.6.28
-#%global percona_compatver     76.1
-#%global compatlib             18
-#%global compatsrc             https://www.percona.com/downloads/Percona-Server-5.6/Percona-Server-%{compatver}-%{percona_compatver}/binary/redhat/7/x86_64/Percona-Server-shared-56-%{compatver}-rel%{percona_compatver}.el7.x86_64.rpm
-#%endif
-#
-#%if 0%{?rhel} == 6
-#%global compat_prefix         51
-#%global compatver             5.1.73
-#%global percona_compatver     14.12
-#%global compatlib             16
-#%global compatsrc             https://www.percona.com/downloads/Percona-Server-5.1/Percona-Server-5.1.73-rel14.12/RPM/rhel6/x86_64/Percona-Server-shared-51-5.1.73-rel14.12.624.rhel6.x86_64.rpm
-#%endif
+%global shared_lib_pri_name mysqlclient
+%global shared_lib_sec_name perconaserverclient
 
 # multiarch
-%global multiarchs            ppc %{power64} %{ix86} x86_64 %{sparc}
+%global multiarchs            ppc %{power64} %{ix86} x86_64 %{sparc} %{arm} aarch64
 
 %global src_dir               %{src_base}-%{mysql_version}-%{greatsql_version}
 
@@ -118,8 +92,6 @@ Source108:      greatsql-8.0.25-15.tar.gz.ai
 Source109:      greatsql-8.0.25-15.tar.gz.aj
 Source110:      greatsql-8.0.25-15.tar.gz.ak
 URL:            https://gitee.com/GreatSQL/GreatSQL
-Packager:       GreatSQL<greatsql@greatdb.com>
-Vendor:         %{greatsql_vendor}
 Source5:        mysql_config.sh
 Source10:       boost_1_73_0.tar.gz
 Source201:      boost_1_73_0.tar.gz.aa
@@ -128,6 +100,40 @@ Source203:      boost_1_73_0.tar.gz.ac
 Source90:       filter-provides.sh
 Source91:       filter-requires.sh
 Patch0:         mysql-5.7-sharedlib-rename.patch
+BuildRequires:  cmake >= 2.8.2
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  perl
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(Env)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Cwd)
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(English)
+BuildRequires:  perl(Errno)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(File::Basename)
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(File::Find)
+BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(IO::Pipe)
+BuildRequires:  perl(IO::Select)
+BuildRequires:  perl(IO::Socket)
+BuildRequires:  perl(IO::Socket::INET)
+BuildRequires:  perl(JSON)
+BuildRequires:  perl(Memoize)
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(Sys::Hostname)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(Time::localtime)
 BuildRequires:  time
 BuildRequires:  libaio-devel
 BuildRequires:  ncurses-devel
@@ -146,20 +152,18 @@ BuildRequires:  pkgconfig(systemd)
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  openldap-devel
 
-
-BuildRequires:  cmake gcc gcc-c++ rpcgen libtirpc-devel m4 libaio-devel libevent-devel lz4-devel 
-
+BuildRequires:  cmake >= 3.6.1
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libtirpc-devel
+BuildRequires:  rpcgen
+BuildRequires:  m4
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
-%if 0%{?rhel} > 6
 # For rpm => 4.9 only: https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering
 %global __requires_exclude ^perl\\((GD|hostnames|lib::mtr|lib::v1|mtr_|My::)
 %global __provides_exclude_from ^(/usr/share/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so)$
-%else
-# https://fedoraproject.org/wiki/EPEL:Packaging#Generic_Filtering_on_EPEL6
-%global __perl_provides %{SOURCE90}
-%global __perl_requires %{SOURCE91}
-%endif
+
 
 %description
 GreatSQL focuses on improving the reliability and performance of MGR, supports InnoDB parallel query and other features, and is a domestic MySQL version suitable for financial applications. It can be used as an optional replacement of MySQL or Percona Server. It is completely free and compatible with MySQL or Percona server.
@@ -260,9 +264,7 @@ Provides:       mysql-devel = %{version}-%{release}
 Provides:       mysql-devel%{?_isa} = %{version}-%{release}
 Conflicts:      Percona-SQL-devel-50 Percona-Server-devel-51 Percona-Server-devel-55 Percona-Server-devel-56 Percona-Server-devel-57
 Obsoletes:      mariadb-connector-c-devel
-%if 0%{?rhel} > 6
 Obsoletes:      mariadb-devel
-%endif
 
 %description -n greatsql-devel
 This package contains the development header files and libraries necessary
@@ -277,7 +279,6 @@ Provides:       mysql-libs = %{version}-%{release}
 Provides:       mysql-libs%{?_isa} = %{version}-%{release}
 Obsoletes:      mysql-libs < %{version}-%{release}
 Provides:       mysql-shared
-#Requires(pre):  greatsql-shared-compat
 
 %description -n greatsql-shared
 This package contains the shared libraries (*.so*) which certain languages
@@ -285,34 +286,43 @@ and applications need to dynamically load and use GreatSQL.
 
 For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 
-#%if 0%{?compatlib}
-#%package -n greatsql-shared-compat
-#Summary:        Shared compat libraries for GreatSQL %{compatver}-%{percona_compatver} database client applications
-#Group:          Applications/Databases
-#Provides:       mysql-libs-compat = %{version}-%{release}
-#Provides:       mysql-libs-compat%{?_isa} = %{version}-%{release}
-#Provides:       MySQL-shared-compat%{?_isa} = %{version}-%{release}
-#%if 0%{?rhel} > 6
-#Provides:       libmysqlclient.so.18()(64bit)
-#Provides:       libmysqlclient.so.18(libmysqlclient_16)(64bit)
-#Provides:       libmysqlclient.so.18(libmysqlclient_18)(64bit)
-#Obsoletes:      mariadb-libs
-#%else
-#Obsoletes:      mysql-libs
-#%endif
-#Conflicts:      Percona-Server-shared-51
-#Conflicts:      Percona-Server-shared-55
-#Conflicts:      Percona-Server-shared-55
-#Conflicts:      Percona-Server-shared-56
-#Conflicts:      Percona-Server-shared-57
+%if 0%{?compatlib}
+%package -n greatsql-shared-compat
+Summary:        Shared compat libraries for GreatSQL %{compatver}-%{percona_compatver} database client applications
+Group:          Applications/Databases
 
-#%description -n greatsql-shared-compat
-#This package contains the shared compat libraries for GreatSQL %{compatver}-%{percona_compatver} client
-#applications.
-#%endif
+Provides:       mysql-libs-compat = %{version}-%{release}
+Provides:       mysql-libs-compat%{?_isa} = %{version}-%{release}
+Provides:       MySQL-shared-compat%{?_isa} = %{version}-%{release}
+
+Obsoletes:      mysql-libs
+
+Conflicts:      Percona-Server-shared-51
+Conflicts:      Percona-Server-shared-55
+Conflicts:      Percona-Server-shared-55
+Conflicts:      Percona-Server-shared-56
+Conflicts:      Percona-Server-shared-57
+
+%description -n greatsql-shared-compat
+This package contains the shared compat libraries for GreatSQL %{compatver}-%{percona_compatver} client
+applications.
+%endif
+
+%if 0%{?tokudb}
+%package -n greatsql-tokudb
+Summary:        GreatSQL - TokuDB package
+Group:          Applications/Databases
+Requires:       greatsql-server = %{version}-%{release}
+Requires:       greatsql-shared = %{version}-%{release}
+Requires:       greatsql-client = %{version}-%{release}
+Requires:       jemalloc >= 3.3.0
+Provides:       tokudb-plugin = %{version}-%{release}
+
+%description -n greatsql-tokudb
+This package contains the TokuDB plugin for GreatSQL %{version}-%{release}
+%endif
 
 %if 0%{?rocksdb}
-# ----------------------------------------------------------------------------
 %package -n greatsql-rocksdb
 Summary:        GreatSQL - RocksDB package
 Group:          Applications/Databases
@@ -354,7 +364,7 @@ cat %{Source201} %{Source202} %{Source203} > %{Source10}
 cat %{Source101} %{Source102} %{Source103} %{Source104} %{Source105} %{Source106} %{Source107} %{Source108} %{Source109} %{Source110} > %{Source0}
 %setup -q -T -a 0 -a 10 -c -n %{src_dir}
 pushd %{src_dir}
-#%patch0 -p0
+%patch0 -p0
 
 %build
 # Fail quickly and obviously if user tries to build as root
@@ -378,12 +388,12 @@ mkdir debug
            -DINSTALL_LAYOUT=RPM \
            -DCMAKE_BUILD_TYPE=Debug \
            -DWITH_BOOST=.. \
-           -DCMAKE_C_FLAGS="$optflags" \
-           -DCMAKE_CXX_FLAGS="$optflags" \
+           -DCMAKE_C_FLAGS="$optflags -fcommon" \
+           -DCMAKE_CXX_FLAGS="$optflags -fcommon" \
 %if 0%{?systemd}
            -DWITH_SYSTEMD=1 \
 %endif
-           -DWITH_INNODB_MEMCACHED=OFF \
+           -DWITH_INNODB_MEMCACHED=1 \
            -DINSTALL_LIBDIR="%{_lib}/mysql" \
            -DINSTALL_PLUGINDIR="%{_lib}/mysql/plugin" \
            -DMYSQL_UNIX_ADDR="%{mysqldatadir}/mysql.sock" \
@@ -391,13 +401,14 @@ mkdir debug
            -DINSTALL_SUPPORTFILESDIR=share/greatsql \
            -DFEATURE_SET="%{feature_set}" \
            -DWITH_PAM=1 \
-           -DWITH_ROCKSDB=ON \
-           -DGROUP_REPLICATION_WITH_ROCKSDB=ON \
-           -DWITH_TOKUDB=OFF \
+           -DWITH_ROCKSDB=1 \
+           -DROCKSDB_DISABLE_AVX2=1 \
+           -DROCKSDB_DISABLE_MARCH_NATIVE=1 \
            -DMYSQL_MAINTAINER_MODE=OFF \
            -DFORCE_INSOURCE_BUILD=1 \
            -DWITH_NUMA=ON \
            -DWITH_LDAP=system \
+           -DWITH_PACKAGE_FLAGS=OFF \
            -DWITH_SYSTEM_LIBS=ON \
            -DWITH_PROTOBUF=bundled \
            -DWITH_RAPIDJSON=bundled \
@@ -408,7 +419,6 @@ mkdir debug
            -DWITH_READLINE=system \
            -DWITH_LIBEVENT=bundled \
            -DWITH_KEYRING_VAULT=ON \
-           -DWITH_NDBCLUSTER=OFF \
            %{?ssl_option} \
            %{?mecab_option} \
            -DCOMPILATION_COMMENT="%{compilation_comment_debug}" %{TOKUDB_FLAGS} %{TOKUDB_DEBUG_OFF} %{ROCKSDB_FLAGS}
@@ -424,12 +434,12 @@ mkdir release
            -DINSTALL_LAYOUT=RPM \
            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
            -DWITH_BOOST=.. \
-           -DCMAKE_C_FLAGS="%{optflags}" \
-           -DCMAKE_CXX_FLAGS="%{optflags}" \
+           -DCMAKE_C_FLAGS="%{optflags} -fcommon" \
+           -DCMAKE_CXX_FLAGS="%{optflags} -fcommon" \
 %if 0%{?systemd}
            -DWITH_SYSTEMD=1 \
 %endif
-           -DWITH_INNODB_MEMCACHED=OFF \
+           -DWITH_INNODB_MEMCACHED=1 \
            -DINSTALL_LIBDIR="%{_lib}/mysql" \
            -DINSTALL_PLUGINDIR="%{_lib}/mysql/plugin" \
            -DMYSQL_UNIX_ADDR="%{mysqldatadir}/mysql.sock" \
@@ -437,13 +447,14 @@ mkdir release
            -DINSTALL_SUPPORTFILESDIR=share/greatsql \
            -DFEATURE_SET="%{feature_set}" \
            -DWITH_PAM=1 \
-           -DWITH_TOKUDB=0 \
            -DWITH_ROCKSDB=1 \
-           -DGROUP_REPLICATION_WITH_ROCKSDB=ON \
+           -DROCKSDB_DISABLE_AVX2=1 \
+           -DROCKSDB_DISABLE_MARCH_NATIVE=1 \
            -DMYSQL_MAINTAINER_MODE=OFF \
            -DFORCE_INSOURCE_BUILD=1 \
            -DWITH_NUMA=ON \
            -DWITH_LDAP=system \
+           -DWITH_PACKAGE_FLAGS=OFF \
            -DWITH_SYSTEM_LIBS=ON \
            -DWITH_LZ4=bundled \
            -DWITH_ZLIB=bundled \
@@ -454,7 +465,6 @@ mkdir release
            -DWITH_LIBEVENT=bundled \
            -DWITH_ZSTD=bundled \
            -DWITH_KEYRING_VAULT=ON \
-           -DWITH_NDBCLUSTER=OFF \
            %{?ssl_option} \
            %{?mecab_option} \
            -DCOMPILATION_COMMENT="%{compilation_comment_release}" %{TOKUDB_FLAGS} %{TOKUDB_DEBUG_OFF} %{ROCKSDB_FLAGS}
@@ -463,17 +473,6 @@ mkdir release
 )
 
 %install
-#%if 0%{?compatlib}
-#  # Install compat libs
-#  %if 0%{?rhel} > 6
-#    install -D -m 0755 percona-compatlib/usr/lib64/libmysqlclient.so.18.1.0 %{buildroot}%{_libdir}/mysql/libmysqlclient.so.18.1.0
-#    install -D -m 0755 percona-compatlib/usr/lib64/libmysqlclient_r.so.18.1.0 %{buildroot}%{_libdir}/mysql/libmysqlclient_r.so.18.1.0
-#  %else
-#    install -D -m 0755 percona-compatlib/usr/lib64/libmysqlclient.so.16.0.0 %{buildroot}%{_libdir}/mysql/libmysqlclient.so.16.0.0
-#    install -D -m 0755 percona-compatlib/usr/lib64/libmysqlclient_r.so.16.0.0 %{buildroot}%{_libdir}/mysql/libmysqlclient_r.so.16.0.0
-#  %endif # 0%{?rhel} > 6
-#%endif # 0%{?compatlib}
-
 MBD=$RPM_BUILD_DIR/%{src_dir}
 
 # Ensure that needed directories exists
@@ -497,28 +496,18 @@ install -D -m 0644 $MBD/release/support-files/mysql-log-rotate %{buildroot}%{_sy
 install -D -m 0644 $MBD/%{src_dir}/build-ps/rpm/mysqld.cnf %{buildroot}%{_sysconfdir}/my.cnf
 install -d %{buildroot}%{_sysconfdir}/my.cnf.d
 
-#%if 0%{?systemd}
-#%else
-%if 0%{?rhel} < 7
-  install -D -m 0755 $MBD/%{src_dir}/build-ps/rpm/mysql.init %{buildroot}%{_sysconfdir}/init.d/mysql
-%endif
 
 # Add libdir to linker
 install -d -m 0755 %{buildroot}%{_sysconfdir}/ld.so.conf.d
 echo "%{_libdir}/mysql" > %{buildroot}%{_sysconfdir}/ld.so.conf.d/mysql-%{_arch}.conf
 
-mv %{buildroot}/%{_bindir}/mysql_config %{buildroot}/%{_bindir}/mysql_config-%{__isa_bits}
-install -p -m 0755 %{SOURCE5} %{buildroot}/%{_bindir}/mysql_config
 # multiarch support
-#%ifarch %{multiarchs}
-#  mv %{buildroot}/%{_bindir}/mysql_config %{buildroot}/%{_bindir}/mysql_config-%{__isa_bits}
-#  install -p -m 0755 %{SOURCE5} %{buildroot}/%{_bindir}/mysql_config
-#%endif
+%ifarch %{multiarchs}
+  mv %{buildroot}/%{_bindir}/mysql_config %{buildroot}/%{_bindir}/mysql_config-%{__isa_bits}
+  install -p -m 0755 %{SOURCE5} %{buildroot}/%{_bindir}/mysql_config
+%endif
 
 %if 0%{?systemd}
-install -D -p -m 0644 scripts/mysqlrouter.service %{buildroot}%{_unitdir}/mysqlrouter.service
-install -D -p -m 0644 packaging/rpm-common/mysqlrouter.conf %{buildroot}%{_tmpfilesdir}/mysqlrouter.conf
-#install -D -p -m 0644 packaging/rpm-common/mysqlrouter.tmpfiles.d %{buildroot}%{_tmpfilesdir}/mysqlrouter.conf
 %else
 install -D -p -m 0755 packaging/rpm-common/mysqlrouter.init %{buildroot}%{_sysconfdir}/init.d/mysqlrouter
 %endif
@@ -532,12 +521,12 @@ rm -f %{buildroot}%{_datadir}/greatsql/win_install_firewall.sql
 rm -rf %{buildroot}%{_bindir}/mysql_embedded
 rm -rf %{buildroot}/usr/cmake/coredumper-relwithdebinfo.cmake
 rm -rf %{buildroot}/usr/cmake/coredumper.cmake
-#%if 0%{?tokudb}
-#  rm -f %{buildroot}%{_prefix}/README.md
-#  rm -f %{buildroot}%{_prefix}/COPYING.AGPLv3
-#  rm -f %{buildroot}%{_prefix}/COPYING.GPLv2
-#  rm -f %{buildroot}%{_prefix}/PATENTS
-#%endif
+%if 0%{?tokudb}
+  rm -f %{buildroot}%{_prefix}/README.md
+  rm -f %{buildroot}%{_prefix}/COPYING.AGPLv3
+  rm -f %{buildroot}%{_prefix}/COPYING.GPLv2
+  rm -f %{buildroot}%{_prefix}/PATENTS
+%endif
 
 # Remove upcoming man pages, to avoid breakage when they materialize
 # Keep this comment as a placeholder for future cases
@@ -607,6 +596,12 @@ if [ -d /etc/greatsql.conf.d ]; then
         echo "!includedir /etc/greatsql.conf.d/" >> /etc/my.cnf
     fi
 fi
+echo "slow_query_log = ON" >> /etc/my.cnf
+echo "long_query_time = 1" >> /etc/my.cnf
+echo "log_slow_verbosity = FULL" >> /etc/my.cnf
+echo "log_error_verbosity = 3" >> /etc/my.cnf
+echo "innodb_buffer_pool_size = 1G" >> /etc/my.cnf
+echo "innodb_log_file_size = 128M" >> /etc/my.cnf
 
 %preun -n greatsql-server
 %if 0%{?systemd}
@@ -652,41 +647,16 @@ fi
 
 %postun -n greatsql-shared -p /sbin/ldconfig
 
-#%if 0%{?compatlib}
-#%if 0%{?rhel} > 6
-#%post -n greatsql-shared-compat
-#for lib in libmysqlclient{.so.18.0.0,.so.18,_r.so.18.0.0,_r.so.18}; do
-#  if [ ! -f %{_libdir}/mysql/${lib} ]; then
-#    ln -s libmysqlclient.so.18.1.0 %{_libdir}/mysql/${lib};
-#  fi
-#done
-#/sbin/ldconfig
-#
-#%postun -n greatsql-shared-compat
-#for lib in libmysqlclient{.so.18.0.0,.so.18,_r.so.18.0.0,_r.so.18}; do
-#  if [ -h %{_libdir}/mysql/${lib} ]; then
-#    rm -f %{_libdir}/mysql/${lib};
-#  fi
-#done
-#/sbin/ldconfig
-#%else
-#%post -n greatsql-shared-compat
-#for lib in libmysqlclient{.so.16.0.0,.so.16,_r.so.16.0.0,_r.so.16}; do
-#  if [ ! -f %{_libdir}/mysql/${lib} ]; then
-#    ln -s libmysqlclient.so.16.1.0 %{_libdir}/mysql/${lib};
-#  fi
-#done
-#/sbin/ldconfig
-
-#%postun -n greatsql-shared-compat
-#for lib in libmysqlclient{.so.16.0.0,.so.16,_r.so.16.0.0,_r.so.16}; do
-#  if [ -h %{_libdir}/mysql/${lib} ]; then
-#    rm -f %{_libdir}/mysql/${lib};
-#  fi
-#done
-#/sbin/ldconfig
-#%endif
-#%endif
+%if 0%{?tokudb}
+%post -n greatsql-tokudb
+if [ $1 -eq 1 ] ; then
+  echo -e "\n\n * This release of GreatSQL is distributed with TokuDB storage engine."
+  echo -e " * Run the following script to enable the TokuDB storage engine in Percona Server:\n"
+  echo -e "\tps-admin --enable-tokudb -u <mysql_admin_user> -p[mysql_admin_pass] [-S <socket>] [-h <host> -P <port>]\n"
+  echo -e " * See http://www.percona.com/doc/percona-server/8.0/tokudb/tokudb_installation.html for more installation details\n"
+  echo -e " * See http://www.percona.com/doc/percona-server/8.0/tokudb/tokudb_intro.html for an introduction to TokuDB\n\n"
+fi
+%endif
 
 %if 0%{?rocksdb}
 %post -n greatsql-rocksdb
@@ -744,23 +714,21 @@ fi
 %attr(644, root, root) %{_mandir}/man1/myisamlog.1*
 %attr(644, root, root) %{_mandir}/man1/myisampack.1*
 %attr(644, root, root) %{_mandir}/man8/mysqld.8*
-#%if 0%{?systemd}
-#%exclude %{_mandir}/man1/mysqld_multi.1*
-#%exclude %{_mandir}/man1/mysqld_safe.1*
-#%else
-#%attr(644, root, root) %{_mandir}/man1/mysqld_multi.1*
-#%attr(644, root, root) %{_mandir}/man1/mysqld_safe.1*
-#%endif
+%if 0%{?systemd}
+%else
+%attr(644, root, root) %{_mandir}/man1/mysqld_multi.1*
+%attr(644, root, root) %{_mandir}/man1/mysqld_safe.1*
+%endif
 %attr(644, root, root) %{_mandir}/man1/mysqldumpslow.1*
 %attr(644, root, root) %{_mandir}/man1/mysql_secure_installation.1*
 %attr(644, root, root) %{_mandir}/man1/mysql_upgrade.1*
 %attr(644, root, root) %{_mandir}/man1/mysqlman.1*
-#%attr(644, root, root) %{_mandir}/man1/mysql.server.1*
 %attr(644, root, root) %{_mandir}/man1/mysql_tzinfo_to_sql.1*
 %attr(644, root, root) %{_mandir}/man1/perror.1*
 %attr(644, root, root) %{_mandir}/man1/mysql_ssl_rsa_setup.1*
 %attr(644, root, root) %{_mandir}/man1/lz4_decompress.1*
 %attr(644, root, root) %{_mandir}/man1/zlib_decompress.1*
+
 
 %config(noreplace) %{_sysconfdir}/my.cnf
 %dir %{_sysconfdir}/my.cnf.d
@@ -797,11 +765,6 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/private/libprotobuf.so.*
 
 %dir %{_libdir}/mysql/plugin
-%attr(755, root, root) %{_libdir}/mysql/plugin/component_keyring_file.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/procfs.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/binlog_utils_udf.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/component_query_attributes.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/component_reference_cache.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/adt_null.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/auth_socket.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/authentication_ldap_sasl_client.so
@@ -812,6 +775,7 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_mysqlbackup.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_validate_password.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_audit_api_message_emit.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/component_query_attributes.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/connection_control.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/ddl_rewriter.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/ha_example.so
@@ -830,6 +794,7 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/semisync_slave.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/validate_password.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/version_token.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/component_keyring_file.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_test_audit_api_message.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_test_host_application_signal.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/test_services_host_application_signal.so
@@ -837,9 +802,13 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_test_udf_services.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/authentication_ldap_simple.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_test_component_deinit.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/binlog_utils_udf.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/test_udf_wrappers.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/component_reference_cache.so
+
+%attr(755, root, root) %{_libdir}/mysql/plugin/component_test_component_deinit.so
+
 %dir %{_libdir}/mysql/plugin/debug
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_keyring_file.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/procfs.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/data_masking.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/adt_null.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/auth_socket.so
@@ -852,6 +821,7 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_mysqlbackup.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_validate_password.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_audit_api_message_emit.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_query_attributes.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/connection_control.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/ddl_rewriter.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/ha_example.so
@@ -870,24 +840,20 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/semisync_slave.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/validate_password.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/version_token.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_keyring_file.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_test_audit_api_message.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_test_host_application_signal.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/test_services_host_application_signal.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_test_udf_services.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_test_component_deinit.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/binlog_utils_udf.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_query_attributes.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_reference_cache.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_sleep_is_connected.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/test_udf_wrappers.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_reference_cache.so
 %if 0%{?mecab}
 %{_libdir}/mysql/mecab
 %attr(755, root, root) %{_libdir}/mysql/plugin/libpluginmecab.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libpluginmecab.so
 %endif
-#coredumper
-%attr(755, root, root) %{_includedir}/coredumper/coredumper.h
-%attr(755, root, root) /usr/lib/libcoredumper.a
 # Percona plugins
 %attr(755, root, root) %{_libdir}/mysql/plugin/audit_log.so
 #%attr(644, root, root) %{_datadir}/mysql-*/audit_log_filter_linux_install.sql
@@ -922,6 +888,8 @@ fi
 #%attr(755, root, root) %{_libdir}/mysql/plugin/debug/query_response_time.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/keyring_vault.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/keyring_vault.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/procfs.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/procfs.so
 #
 #%attr(644, root, root) %{_datadir}/greatsql/fill_help_tables.sql
 #%attr(644, root, root) %{_datadir}/greatsql/mysql_sys_schema.sql
@@ -990,7 +958,6 @@ fi
 %attr(755, root, root) %{_bindir}/mysqlslap
 %attr(755, root, root) %{_bindir}/mysql_config_editor
 %attr(755, root, root) %{_bindir}/mysql_migrate_keyring
-%attr(755, root, root) %{_bindir}/mysql_keyring_encryption_test
 
 %attr(644, root, root) %{_mandir}/man1/mysql.1*
 %attr(644, root, root) %{_mandir}/man1/mysqladmin.1*
@@ -1023,6 +990,9 @@ fi
 %dir %attr(755, root, root) %{_libdir}/mysql
 %attr(644, root, root) %{_sysconfdir}/ld.so.conf.d/mysql-%{_arch}.conf
 %{_libdir}/mysql/lib%{shared_lib_pri_name}.so.21*
+#coredumper
+%attr(755, root, root) %{_includedir}/coredumper/coredumper.h
+%attr(755, root, root) /usr/lib/libcoredumper.a
 
 %files -n greatsql-test
 %defattr(-, root, root, -)
@@ -1032,9 +1002,8 @@ fi
 %attr(755, root, root) %{_bindir}/mysqltest
 %attr(755, root, root) %{_bindir}/mysqltest_safe_process
 %attr(755, root, root) %{_bindir}/mysqlxtest
+%attr(755, root, root) %{_bindir}/mysql_keyring_encryption_test
 
-%attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_sleep_is_connected.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/test_udf_wrappers.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/auth.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/auth_test_plugin.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/component_example_component1.so
@@ -1091,6 +1060,7 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_processlist.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_replication.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_shutdown.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_sleep_is_connected.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_stmt.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_sqlmode.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/libtest_sql_stored_procedures_functions.so
@@ -1164,6 +1134,7 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_processlist.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_replication.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_shutdown.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_sleep_is_connected.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_stmt.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_sqlmode.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_stored_procedures_functions.so
@@ -1178,11 +1149,19 @@ fi
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/test_udf_services.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/udf_example.so
 %attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_mysqlx_global_reset.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/binlog_utils_udf.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_query_attributes.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/component_reference_cache.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/libtest_sql_sleep_is_connected.so
-%attr(755, root, root) %{_libdir}/mysql/plugin/debug/test_udf_wrappers.so
+
+%if 0%{?tokudb}
+%files -n greatsql-tokudb
+%attr(-, root, root)
+%{_bindir}/tokuftdump
+%{_libdir}/mysql/plugin/ha_tokudb.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/ha_tokudb.so
+%attr(755, root, root) %{_bindir}/tokuft_logprint
+%attr(755, root, root) %{_libdir}/mysql/plugin/tokudb_backup.so
+%attr(755, root, root) %{_libdir}/mysql/plugin/debug/tokudb_backup.so
+%attr(755, root, root) %{_libdir}/mysql/libHotBackup.so
+%{_includedir}/backup.h
+%endif
 
 %if 0%{?rocksdb}
 %files -n greatsql-rocksdb
@@ -1199,6 +1178,7 @@ fi
 %doc %{src_dir}/router/README.router  %{src_dir}/router/LICENSE.router
 %dir %{_sysconfdir}/mysqlrouter
 %config(noreplace) %{_sysconfdir}/mysqlrouter/mysqlrouter.conf
+%attr(644, root, root) %config(noreplace,missingok) %{_sysconfdir}/logrotate.d/mysqlrouter
 %{_bindir}/mysqlrouter
 %{_bindir}/mysqlrouter_keyring
 %{_bindir}/mysqlrouter_passwd
@@ -1212,12 +1192,15 @@ fi
 %else
 %{_sysconfdir}/init.d/mysqlrouter
 %endif
-%{_libdir}/mysqlrouter/private/libmysqlharness*.so.*
-%{_libdir}/mysqlrouter/private/libmysqlrouter*.so.*
+%{_libdir}/mysqlrouter/private/libmysqlharness.so.*
+%{_libdir}/mysqlrouter/private/libmysqlharness_stdx.so.*
+%{_libdir}/mysqlrouter/private/libmysqlharness_tls.so.*
+%{_libdir}/mysqlrouter/private/libmysqlrouter.so.*
 %{_libdir}/mysqlrouter/private/libmysqlrouter_http.so.*
 %{_libdir}/mysqlrouter/private/libmysqlrouter_http_auth_backend.so.*
 %{_libdir}/mysqlrouter/private/libmysqlrouter_http_auth_realm.so.*
 %{_libdir}/mysqlrouter/private/libprotobuf-lite.so.*
+%{_libdir}/mysqlrouter/private/libmysqlrouter_io_component.so.1
 %dir %{_libdir}/mysqlrouter
 %dir %{_libdir}/mysqlrouter/private
 %{_libdir}/mysqlrouter/*.so
