@@ -80,25 +80,25 @@ Group:          Applications/Databases
 Version:        %{mysql_version}
 Release:        %{release}
 License:        Copyright (c) 2000, 2018, %{mysql_vendor}. All rights reserved. Under %{?license_type} license as shown in the Description field..
-Source0:        greatsql-8.0.25-15.tar.gz
-Source101:      greatsql-8.0.25-15.tar.gz.aa
-Source102:      greatsql-8.0.25-15.tar.gz.ab
-Source103:      greatsql-8.0.25-15.tar.gz.ac
-Source104:      greatsql-8.0.25-15.tar.gz.ad
-Source105:      greatsql-8.0.25-15.tar.gz.ae
-Source106:      greatsql-8.0.25-15.tar.gz.af
-Source107:      greatsql-8.0.25-15.tar.gz.ah
-Source108:      greatsql-8.0.25-15.tar.gz.ai
-Source109:      greatsql-8.0.25-15.tar.gz.aj
-Source110:      greatsql-8.0.25-15.tar.gz.ak
+SOURCE0:        greatsql-8.0.25-15.tar.gz
+SOURCE101:      greatsql-8.0.25-15.tar.gz.aa
+SOURCE102:      greatsql-8.0.25-15.tar.gz.ab
+SOURCE103:      greatsql-8.0.25-15.tar.gz.ac
+SOURCE104:      greatsql-8.0.25-15.tar.gz.ad
+SOURCE105:      greatsql-8.0.25-15.tar.gz.ae
+SOURCE106:      greatsql-8.0.25-15.tar.gz.af
+SOURCE107:      greatsql-8.0.25-15.tar.gz.ah
+SOURCE108:      greatsql-8.0.25-15.tar.gz.ai
+SOURCE109:      greatsql-8.0.25-15.tar.gz.aj
+SOURCE110:      greatsql-8.0.25-15.tar.gz.ak
 URL:            https://gitee.com/GreatSQL/GreatSQL
-Source5:        mysql_config.sh
-Source10:       boost_1_73_0.tar.gz
-Source201:      boost_1_73_0.tar.gz.aa
-Source202:      boost_1_73_0.tar.gz.ab
-Source203:      boost_1_73_0.tar.gz.ac
-Source90:       filter-provides.sh
-Source91:       filter-requires.sh
+SOURCE5:        mysql_config.sh
+SOURCE10:       boost_1_73_0.tar.gz
+SOURCE201:      boost_1_73_0.tar.gz.aa
+SOURCE202:      boost_1_73_0.tar.gz.ab
+SOURCE203:      boost_1_73_0.tar.gz.ac
+SOURCE90:       filter-provides.sh
+SOURCE91:       filter-requires.sh
 Patch0:         mysql-5.7-sharedlib-rename.patch
 BuildRequires:  cmake >= 2.8.2
 BuildRequires:  gcc
@@ -360,8 +360,8 @@ necessary to develop GreatSQL MySQL Router applications.
 For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 
 %prep
-cat %{Source201} %{Source202} %{Source203} > %{Source10}
-cat %{Source101} %{Source102} %{Source103} %{Source104} %{Source105} %{Source106} %{Source107} %{Source108} %{Source109} %{Source110} > %{Source0}
+cat %{SOURCE201} %{SOURCE202} %{SOURCE203} > %{SOURCE10}
+cat %{SOURCE101} %{SOURCE102} %{SOURCE103} %{SOURCE104} %{SOURCE105} %{SOURCE106} %{SOURCE107} %{SOURCE108} %{SOURCE109} %{SOURCE110} > %{SOURCE0}
 %setup -q -T -a 0 -a 10 -c -n %{src_dir}
 pushd %{src_dir}
 %patch0 -p0
