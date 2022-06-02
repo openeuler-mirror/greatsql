@@ -1,5 +1,5 @@
 # 关于 GreatSQL
----
+--- 
 
 GreatSQL开源数据库专注于提升MGR可靠性及性能，支持InnoDB并行查询等特性，是适用于金融级应用的国内自主MySQL版本；可以作为MySQL或Percona Server的可选替换，用于线上生产环境；且完全免费并兼容MySQL或Percona Server。
 
@@ -74,7 +74,7 @@ $ systemctl status mysqld
 
 RPM方式安装后的GreatSQL默认配置不是太合理，建议参考下面这份my.cnf文档：
 
-- [my.cnf for GreatSQL 8.0.25](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/docs/my.cnf-example-greatsql-8.0.25-15)
+- [my.cnf for GreatSQL 8.0.25-16](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/docs/my.cnf-example-greatsql-8.0.25-16)
 
 调整文档中关于`datadir`目录配置等相关选项，默认 `datadir=/var/lib/mysql` 通常都会改掉，例如替换成 `datadir=/data/GreatSQL`，修改完后保存退出，
 替换原来的 `/etc/my.cnf`，然后重启GreatSQL，会重新进行初始化。
@@ -100,7 +100,7 @@ $ mysql -uroot -p'dt_)MtExl594'
 mysql: [Warning] Using a password on the command line interface can be insecure.
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 8
-Server version: 8.0.25-15
+Server version: 8.0.25-16
 
 Copyright (c) 2021-2021 GreatDB Software Co., Ltd
 Copyright (c) 2009-2021 Percona LLC and/or its affiliates
@@ -170,7 +170,8 @@ mysql> SELECT * FROM t1;
 ## 版本历史
 ---
 ### GreatSQL 8.0
-- [GreatSQL 更新说明 8.0.25(2021-8-26)](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/relnotes/changes-greatsql-8-0-25-20210820.md)
+- [GreatSQL 更新说明 8.0.25-16(2021-5-16)](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/relnotes/changes-greatsql-8-0-25-16-20220516.md)
+- [GreatSQL 更新说明 8.0.25-15(2021-8-26)](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/relnotes/changes-greatsql-8-0-25-20210820.md)
 
 
 ## 更多使用文档
