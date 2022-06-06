@@ -9,7 +9,7 @@
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
 %global rpm_release 1
 
-%global release %{rpm_release}%{?dist}
+%global release %{greatsql_version}.%{rpm_release}%{?dist}
 
 # By default, a build will be done using the system SSL library
 %{?with_ssl: %global ssl_option -DWITH_SSL=%{with_ssl}}
@@ -245,6 +245,7 @@ Requires:       perl(POSIX)
 Requires:       perl(Sys::Hostname)
 Requires:       perl(Time::HiRes)
 Requires:       perl(Time::localtime)
+Requires(pre):  greatsql-shared greatsql-client greatsql-server
 Provides:       MySQL-test%{?_isa} = %{version}-%{release}
 Obsoletes:      MySQL-test < %{version}-%{release}
 Obsoletes:      mysql-test < %{version}-%{release}
@@ -1207,8 +1208,8 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
 %changelog
-* Wed Jun  2 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16
-- Release GreatSQL-8.0.25-16 for openEuler
+* Wed Jun  6 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.1
+- Release GreatSQL-8.0.25-16.1 for openEuler
 
-* Mon Apr 25 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15
-- Release GreatSQL-8.0.25-15 for openEuler
+* Mon Apr 25 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15.1
+- Release GreatSQL-8.0.25-15.1 for openEuler
