@@ -102,6 +102,7 @@ SOURCE90:       filter-provides.sh
 SOURCE91:       filter-requires.sh
 Patch0:         mysql-5.7-sharedlib-rename.patch
 BuildRequires:  cmake >= 2.8.2
+BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  perl
@@ -175,6 +176,7 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 Summary:        GreatSQL: Open source database that can be used to replace MySQL or Percona Server.
 Group:          Applications/Databases
 Requires:       coreutils
+Requires:       bash
 Requires:       grep
 Requires:       procps
 Requires:       shadow-utils
