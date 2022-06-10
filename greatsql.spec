@@ -4,8 +4,8 @@
 %global mysqldatadir /var/lib/mysql
 
 %global mysql_version 8.0.25
-%global greatsql_version 15
-%global revision c7feae175e0
+%global greatsql_version 16
+%global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
 %global rpm_release 1
 
@@ -80,18 +80,18 @@ Group:          Applications/Databases
 Version:        %{mysql_version}
 Release:        %{release}
 License:        Copyright (c) 2000, 2018, %{mysql_vendor}. All rights reserved. Under %{?license_type} license as shown in the Description field..
-SOURCE0:        greatsql-8.0.25-15.tar.gz
-SOURCE101:      greatsql-8.0.25-15.tar.gz.aa
-SOURCE102:      greatsql-8.0.25-15.tar.gz.ab
-SOURCE103:      greatsql-8.0.25-15.tar.gz.ac
-SOURCE104:      greatsql-8.0.25-15.tar.gz.ad
-SOURCE105:      greatsql-8.0.25-15.tar.gz.ae
-SOURCE106:      greatsql-8.0.25-15.tar.gz.af
-SOURCE107:      greatsql-8.0.25-15.tar.gz.ag
-SOURCE108:      greatsql-8.0.25-15.tar.gz.ah
-SOURCE109:      greatsql-8.0.25-15.tar.gz.ai
-SOURCE110:      greatsql-8.0.25-15.tar.gz.aj
-SOURCE111:      greatsql-8.0.25-15.tar.gz.ak
+SOURCE0:        greatsql-8.0.25-16.tar.gz
+SOURCE101:      greatsql-8.0.25-16.tar.gz.aa
+SOURCE102:      greatsql-8.0.25-16.tar.gz.ab
+SOURCE103:      greatsql-8.0.25-16.tar.gz.ac
+SOURCE104:      greatsql-8.0.25-16.tar.gz.ad
+SOURCE105:      greatsql-8.0.25-16.tar.gz.ae
+SOURCE106:      greatsql-8.0.25-16.tar.gz.af
+SOURCE107:      greatsql-8.0.25-16.tar.gz.ag
+SOURCE108:      greatsql-8.0.25-16.tar.gz.ah
+SOURCE109:      greatsql-8.0.25-16.tar.gz.ai
+SOURCE110:      greatsql-8.0.25-16.tar.gz.aj
+SOURCE111:      greatsql-8.0.25-16.tar.gz.ak
 URL:            https://gitee.com/GreatSQL/GreatSQL
 SOURCE5:        mysql_config.sh
 SOURCE10:       boost_1_73_0.tar.gz
@@ -102,6 +102,7 @@ SOURCE90:       filter-provides.sh
 SOURCE91:       filter-requires.sh
 Patch0:         mysql-5.7-sharedlib-rename.patch
 BuildRequires:  cmake >= 2.8.2
+BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  perl
@@ -175,6 +176,7 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 Summary:        GreatSQL: Open source database that can be used to replace MySQL or Percona Server.
 Group:          Applications/Databases
 Requires:       coreutils
+Requires:       bash /bin/sh
 Requires:       grep
 Requires:       procps
 Requires:       shadow-utils
@@ -245,6 +247,7 @@ Requires:       perl(POSIX)
 Requires:       perl(Sys::Hostname)
 Requires:       perl(Time::HiRes)
 Requires:       perl(Time::localtime)
+Requires(pre):  greatsql-shared greatsql-client greatsql-server
 Provides:       MySQL-test%{?_isa} = %{version}-%{release}
 Obsoletes:      MySQL-test < %{version}-%{release}
 Obsoletes:      mysql-test < %{version}-%{release}
@@ -1207,5 +1210,8 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
 %changelog
-* Mon Apr 25 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15
-- Release GreatSQL-8.0.25-15 for openEuler
+* Wed Jun  6 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.1
+- Release GreatSQL-8.0.25-16.1 for openEuler
+
+* Mon Apr 25 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-15.1
+- Release GreatSQL-8.0.25-15.1 for openEuler
