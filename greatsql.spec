@@ -176,7 +176,7 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 Summary:        GreatSQL: Open source database that can be used to replace MySQL or Percona Server.
 Group:          Applications/Databases
 Requires:       coreutils
-Requires:       bash
+Requires:       bash /bin/sh
 Requires:       grep
 Requires:       procps
 Requires:       shadow-utils
