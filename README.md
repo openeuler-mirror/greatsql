@@ -8,14 +8,16 @@ GreatSQL开源数据库专注于提升MGR可靠性及性能，支持InnoDB并行
 GreatSQL除了提升MGR性能及可靠性，还引入InnoDB事务锁优化及并行查询优化等特性，以及众多BUG修复。
 选用GreatSQl主要有以下几点优势：
 
-- 提升MGR模式下的大事务并发性能及稳定性
-- 改进MGR的GC及流控算法，以及减少每次发送数据量，避免性能抖动
-- 在MGR集群AFTER模式下，解决了节点加入集群时容易出错的问题
-- 在MGR集群AFTER模式下，强一致性采用多数派原则，以适应网络分区的场景
-- 当MGR节点崩溃时，能更快发现节点异常状态，有效减少切主和异常节点的等待时间
-- 优化InnoDB事务锁机制，在高并发场景中有效提升事务并发性能至少10%以上
-- 实现InnoDB并行查询机制，极大提升聚合查询效率，TPC-H测试中，最高可提升40多倍，平均提升15倍。特别适用于周期性数据汇总报表之类的SAP、财务统计等业务
-- 修复了MGR模式下可能导致数据丢失、性能抖动、节点加入恢复极慢等多个缺陷或BUG
+- GreatSQL是由万里数据库维护的MySQL分支
+- 专注于提升MGR可靠性及性能，支持InnoDB并行查询特性
+- 是适用于金融级应用的MySQL分支版本
+- 地理标签，提升多机房架构数据可靠性
+- 仲裁节点，用更低的服务器成本实现更高可用
+- 单主模式下更快，选主机制更完善
+- InnoDB表也支持并行查询，让CPU资源不再浪费
+- 全新流控机制，让MGR运行更流畅不频繁抖动
+- 相对官方社区版，MGR运行更稳定、可靠
+- 其他...
 
 ## 注意事项
 ---
@@ -173,6 +175,10 @@ mysql> SELECT * FROM t1;
 - [GreatSQL 更新说明 8.0.25-16(2021-5-16)](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/relnotes/changes-greatsql-8-0-25-16-20220516.md)
 - [GreatSQL 更新说明 8.0.25-15(2021-8-26)](https://gitee.com/GreatSQL/GreatSQL-Doc/blob/master/relnotes/changes-greatsql-8-0-25-20210820.md)
 
+
+## MTR回归测试
+GreatSQL已经在openEuler 20.03 (LTS-SP2) 环境下通过MTR回归测试，表明GreatSQL与openEuler开源操作系统完全兼容，功能齐全，测试完备。
+相关MTR测试报告详见：[GreatSQL 8.0.25-16通过MTR回归测试](https://gitee.com/src-openeuler/greatsql/blob/master/greatsql-802516-mtr-passed.md)。
 
 ## 更多使用文档
 ---
