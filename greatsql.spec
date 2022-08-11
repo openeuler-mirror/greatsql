@@ -7,7 +7,7 @@
 %global greatsql_version 16
 %global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
-%global rpm_release 1
+%global rpm_release 2
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
@@ -164,7 +164,10 @@ BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 # For rpm => 4.9 only: https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering
 %global __requires_exclude ^perl\\((GD|hostnames|lib::mtr|lib::v1|mtr_|My::)
-%global __provides_exclude_from ^(/usr/share/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so)$
+%global __provides_exclude_from ^(/usr/share/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so|/usr/include/mysql/.*|/usr/share/man/man.*/mysql.*|/etc/my.cnf|/usr/bin/mysql.*|/usr/sbin/mysqld.*|*libprotobuf*|*libmysqlclient.so*|*libmysqlharness*|*libmysqlrouter*|*mysqlclient*|*libdaemon*|*libfnv*|*libmemcached*|*libmurmur*|*libtest*)$
+
+%global _privatelibs (*libprotobuf*|*libmysqlclient.so*|*libmysqlharness*|*libmysqlrouter*|*mysqlclient*|*libdaemon*|*libfnv*|*libmemcached*|*libmurmur*|*libtest*)*
+%global __provides_exclude %{_privatelibs}
 
 
 %description
@@ -184,9 +187,6 @@ Requires:       net-tools
 Requires(pre):  greatsql-shared
 Requires:       greatsql-client
 Requires:       openssl
-Provides:       MySQL-server%{?_isa} = %{version}-%{release}
-Provides:       mysql-server = %{version}-%{release}
-Provides:       mysql-server%{?_isa} = %{version}-%{release}
 Conflicts:      Percona-SQL-server-50 Percona-Server-server-51 Percona-Server-server-55 Percona-Server-server-56 Percona-Server-server-57
 
 %if 0%{?systemd}
@@ -208,7 +208,6 @@ GreatSQL focuses on improving the reliability and performance of MGR, supports I
 Summary:        GreatSQL - Client
 Group:          Applications/Databases
 Requires:       greatsql-shared
-Provides:       mysql-client MySQL-client mysql MySQL
 Conflicts:      Percona-SQL-client-50 Percona-Server-client-51 Percona-Server-client-55 Percona-Server-client-56 Percona-Server-client-57
 
 %description -n greatsql-client
@@ -248,12 +247,9 @@ Requires:       perl(Sys::Hostname)
 Requires:       perl(Time::HiRes)
 Requires:       perl(Time::localtime)
 Requires(pre):  greatsql-shared greatsql-client greatsql-server
-Provides:       MySQL-test%{?_isa} = %{version}-%{release}
 Obsoletes:      MySQL-test < %{version}-%{release}
 Obsoletes:      mysql-test < %{version}-%{release}
 Obsoletes:      mariadb-test
-Provides:       mysql-test = %{version}-%{release}
-Provides:       mysql-test%{?_isa} = %{version}-%{release}
 Conflicts:      Percona-SQL-test-50 Percona-Server-test-51 Percona-Server-test-55 Percona-Server-test-56 Percona-Server-test-57
 
 %description -n greatsql-test
@@ -264,8 +260,6 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 %package -n greatsql-devel
 Summary:        GreatSQL - Development header files and libraries
 Group:          Applications/Databases
-Provides:       mysql-devel = %{version}-%{release}
-Provides:       mysql-devel%{?_isa} = %{version}-%{release}
 Conflicts:      Percona-SQL-devel-50 Percona-Server-devel-51 Percona-Server-devel-55 Percona-Server-devel-56 Percona-Server-devel-57
 Obsoletes:      mariadb-connector-c-devel
 Obsoletes:      mariadb-devel
@@ -279,10 +273,7 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 %package -n greatsql-shared
 Summary:        GreatSQL - Shared libraries
 Group:          Applications/Databases
-Provides:       mysql-libs = %{version}-%{release}
-Provides:       mysql-libs%{?_isa} = %{version}-%{release}
 Obsoletes:      mysql-libs < %{version}-%{release}
-Provides:       mysql-shared
 
 %description -n greatsql-shared
 This package contains the shared libraries (*.so*) which certain languages
@@ -294,10 +285,6 @@ For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 %package -n greatsql-shared-compat
 Summary:        Shared compat libraries for GreatSQL %{compatver}-%{percona_compatver} database client applications
 Group:          Applications/Databases
-
-Provides:       mysql-libs-compat = %{version}-%{release}
-Provides:       mysql-libs-compat%{?_isa} = %{version}-%{release}
-Provides:       MySQL-shared-compat%{?_isa} = %{version}-%{release}
 
 Obsoletes:      mysql-libs
 
@@ -320,7 +307,6 @@ Requires:       greatsql-server = %{version}-%{release}
 Requires:       greatsql-shared = %{version}-%{release}
 Requires:       greatsql-client = %{version}-%{release}
 Requires:       jemalloc >= 3.3.0
-Provides:       tokudb-plugin = %{version}-%{release}
 
 %description -n greatsql-tokudb
 This package contains the TokuDB plugin for GreatSQL %{version}-%{release}
@@ -343,7 +329,6 @@ Summary:       GreatSQL MySQL Router
 Group:         Applications/Databases
 Provides:      greatsql-mysql-router = %{version}-%{release}
 Obsoletes:     greatsql-mysql-router < %{version}-%{release}
-Provides:      mysql-router
 
 %description -n greatsql-mysql-router
 The GreatSQL MySQL Router software delivers a fast, multi-threaded way of
@@ -1210,6 +1195,9 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
 %changelog
+* Tue Aug 9 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.2
+- Hide the conflict libs and files.
+
 * Wed Jun  6 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.1
 - Release GreatSQL-8.0.25-16.1 for openEuler
 
