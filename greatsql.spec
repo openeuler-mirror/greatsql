@@ -7,7 +7,7 @@
 %global greatsql_version 16
 %global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
-%global rpm_release 2
+%global rpm_release 3
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
@@ -166,9 +166,9 @@ BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 %global __requires_exclude ^perl\\((GD|hostnames|lib::mtr|lib::v1|mtr_|My::)
 %global __provides_exclude_from ^(/usr/share/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so|/usr/include/mysql/.*|/usr/share/man/man.*/mysql.*|/etc/my.cnf|/usr/bin/mysql.*|/usr/sbin/mysqld.*|*libprotobuf*|*libmysqlclient.so*|*libmysqlharness*|*libmysqlrouter*|*mysqlclient*|*libdaemon*|*libfnv*|*libmemcached*|*libmurmur*|*libtest*)$
 
-%global _privatelibs (*libprotobuf*|*libmysqlclient.so*|*libmysqlharness*|*libmysqlrouter*|*mysqlclient*|*libdaemon*|*libfnv*|*libmemcached*|*libmurmur*|*libtest*)*
+%global _privatelibs lib(protobuf|mysqlclient|mysqlharness|mysqlrouter|mysqlclient|daemon|fnv|memcached|murmur|test)*\\.so*
 %global __provides_exclude %{_privatelibs}
-
+%global __requires_exclude %{_privatelibs}
 
 %description
 GreatSQL focuses on improving the reliability and performance of MGR, supports InnoDB parallel query and other features, and is a domestic MySQL version suitable for financial applications. It can be used as an optional replacement of MySQL or Percona Server. It is completely free and compatible with MySQL or Percona server.
@@ -1195,6 +1195,9 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
 %changelog
+* Fri Aug 12 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.3
+- Hide the conflict libs and files from provides and requires.
+
 * Tue Aug 9 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.2
 - Hide the conflict libs and files.
 
