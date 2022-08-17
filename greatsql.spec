@@ -7,7 +7,7 @@
 %global greatsql_version 16
 %global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
-%global rpm_release 3
+%global rpm_release 4
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
@@ -346,6 +346,14 @@ Obsoletes:      mysql-router-devel
 This package contains the development header files and libraries
 necessary to develop GreatSQL MySQL Router applications.
 
+For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
+
+%package   -n   greatsql-mysql-config
+Summary:        GreatSQL config
+Provides:       greatsql-mysql-config = %{version}-%{release}
+Conflicts:      mysql-config
+
+%description -n greatsql-mysql-config
 For a description of GreatSQL see https://gitee.com/GreatSQL/GreatSQL
 
 %prep
@@ -717,10 +725,6 @@ fi
 %attr(644, root, root) %{_mandir}/man1/mysql_ssl_rsa_setup.1*
 %attr(644, root, root) %{_mandir}/man1/lz4_decompress.1*
 %attr(644, root, root) %{_mandir}/man1/zlib_decompress.1*
-
-
-%config(noreplace) %{_sysconfdir}/my.cnf
-%dir %{_sysconfdir}/my.cnf.d
 
 %attr(755, root, root) %{_bindir}/comp_err
 %attr(755, root, root) %{_bindir}/innochecksum
@@ -1194,7 +1198,14 @@ fi
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/log/mysqlrouter
 %dir %attr(755, mysqlrouter, mysqlrouter) /var/run/mysqlrouter
 
+%files -n greatsql-mysql-config
+%config(noreplace) %{_sysconfdir}/my.cnf
+%dir %{_sysconfdir}/my.cnf.d
+
 %changelog
+* Tue Aug 16 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.4
+- new package greatsql-mysql-config
+
 * Fri Aug 12 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.3
 - Hide the conflict libs and files from provides and requires.
 
