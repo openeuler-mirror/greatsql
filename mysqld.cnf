@@ -31,3 +31,6 @@
 # socket=/var/lib/mysql/mysql.sock
 # log-error=/var/log/mysqld.log
 # pid-file=/var/run/mysqld/mysqld.pid
+
+# Keep the same behavior like other MySQL based/series Databases(MariaDB, Percona, GreatSQL, MySQL5.7 and MySQL8.0)
+!includedir /etc/my.cnf.d
