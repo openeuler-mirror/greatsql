@@ -7,7 +7,7 @@
 %global greatsql_version 16
 %global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
-%global rpm_release 4
+%global rpm_release 5
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
@@ -100,6 +100,7 @@ SOURCE202:      boost_1_73_0.tar.gz.ab
 SOURCE203:      boost_1_73_0.tar.gz.ac
 SOURCE90:       filter-provides.sh
 SOURCE91:       filter-requires.sh
+SOURCE11:       mysqld.cnf
 Patch0:         mysql-5.7-sharedlib-rename.patch
 BuildRequires:  cmake >= 2.8.2
 BuildRequires:  make
@@ -184,7 +185,7 @@ Requires:       grep
 Requires:       procps
 Requires:       shadow-utils
 Requires:       net-tools
-Requires(pre):  greatsql-shared
+Requires(pre):  greatsql-shared greatsql-mysql-config
 Requires:       greatsql-client
 Requires:       openssl
 Conflicts:      Percona-SQL-server-50 Percona-Server-server-51 Percona-Server-server-55 Percona-Server-server-56 Percona-Server-server-57
@@ -362,6 +363,7 @@ cat %{SOURCE101} %{SOURCE102} %{SOURCE103} %{SOURCE104} %{SOURCE105} %{SOURCE106
 %setup -q -T -a 0 -a 10 -c -n %{src_dir}
 pushd %{src_dir}
 %patch0 -p0
+cp %{SOURCE11} scripts
 
 %build
 # Fail quickly and obviously if user tries to build as root
@@ -490,7 +492,7 @@ make DESTDIR=%{buildroot} install
 #install -D -m 0644 packaging/rpm-common/mysql.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/mysql
 #investigate this logrotate
 install -D -m 0644 $MBD/release/support-files/mysql-log-rotate %{buildroot}%{_sysconfdir}/logrotate.d/mysql
-install -D -m 0644 $MBD/%{src_dir}/build-ps/rpm/mysqld.cnf %{buildroot}%{_sysconfdir}/my.cnf
+install -D -p -m 0644 %{_builddir}/greatsql-%{version}-%{greatsql_version}/greatsql-%{version}-%{greatsql_version}/scripts/mysqld.cnf %{buildroot}%{_sysconfdir}/my.cnf
 install -d %{buildroot}%{_sysconfdir}/my.cnf.d
 
 
@@ -593,6 +595,10 @@ if [ -d /etc/greatsql.conf.d ]; then
         echo "!includedir /etc/greatsql.conf.d/" >> /etc/my.cnf
     fi
 fi
+echo "datadir=/var/lib/mysql" >> /etc/my.cnf
+echo "socket=/var/lib/mysql/mysql.sock" >> /etc/my.cnf
+echo "log-error=/var/log/mysqld.log" >> /etc/my.cnf
+echo "pid-file=/var/run/mysqld/mysqld.pid" >> /etc/my.cnf
 echo "slow_query_log = ON" >> /etc/my.cnf
 echo "long_query_time = 1" >> /etc/my.cnf
 echo "log_slow_verbosity = FULL" >> /etc/my.cnf
@@ -1203,6 +1209,10 @@ fi
 %dir %{_sysconfdir}/my.cnf.d
 
 %changelog
+* Tue Sep 13 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.5
+- refactor the mysqld.cnf into the rpm package
+- Add the self-dependency towards greatsql-server and greatsql-mysql-config.
+
 * Tue Aug 16 2022 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.4
 - new package greatsql-mysql-config
 
