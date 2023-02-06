@@ -143,7 +143,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
 BuildRequires:  readline-devel
 BuildRequires:  numactl-devel
-BuildRequires:  openssl-devel
+BuildRequires:  compat-openssl11-devel
 BuildRequires:  zlib-devel
 BuildRequires:  bison
 BuildRequires:  openldap-devel
@@ -187,7 +187,7 @@ Requires:       shadow-utils
 Requires:       net-tools
 Requires(pre):  greatsql-shared greatsql-mysql-config
 Requires:       greatsql-client
-Requires:       openssl
+Requires:       compat-openssl11-devel
 Conflicts:      Percona-SQL-server-50 Percona-Server-server-51 Percona-Server-server-55 Percona-Server-server-56 Percona-Server-server-57
 
 %if 0%{?systemd}
@@ -1209,6 +1209,9 @@ fi
 %dir %{_sysconfdir}/my.cnf.d
 
 %changelog
+* Mon Feb  6 2023 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.6
+- compat-openssl11-devel
+
 * Tue Sep 13 2022 bzhaoop <bzhaojyathousandy@gmail.com> - 8.0.25-16.5
 - refactor the mysqld.cnf into the rpm package
 - Add the self-dependency towards greatsql-server and greatsql-mysql-config.
