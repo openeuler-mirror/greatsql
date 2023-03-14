@@ -7,7 +7,7 @@
 %global greatsql_version 16
 %global revision 8bb0e5af297
 %global tokudb_backup_version %{mysql_version}-%{greatsql_version}
-%global rpm_release 5
+%global rpm_release 7
 
 %global release %{greatsql_version}.%{rpm_release}%{?dist}
 
@@ -102,6 +102,8 @@ SOURCE90:       filter-provides.sh
 SOURCE91:       filter-requires.sh
 SOURCE11:       mysqld.cnf
 Patch0:         mysql-5.7-sharedlib-rename.patch
+Patch1:         use-largest-lock-free-type-selector-on-riscv.patch
+Patch2:         add-riscv64-support.patch
 BuildRequires:  cmake >= 2.8.2
 BuildRequires:  make
 BuildRequires:  gcc
@@ -363,6 +365,8 @@ cat %{SOURCE101} %{SOURCE102} %{SOURCE103} %{SOURCE104} %{SOURCE105} %{SOURCE106
 %setup -q -T -a 0 -a 10 -c -n %{src_dir}
 pushd %{src_dir}
 %patch0 -p0
+%patch1 -p1
+%patch2 -p1
 cp %{SOURCE11} scripts
 
 %build
@@ -405,6 +409,9 @@ mkdir debug
            -DROCKSDB_DISABLE_MARCH_NATIVE=1 \
            -DMYSQL_MAINTAINER_MODE=OFF \
            -DFORCE_INSOURCE_BUILD=1 \
+%ifarch riscv64
+           -DCMAKE_CXX_STANDARD_LIBRARIES=-latomic \
+%endif
            -DWITH_NUMA=ON \
            -DWITH_LDAP=system \
            -DWITH_PACKAGE_FLAGS=OFF \
@@ -451,6 +458,9 @@ mkdir release
            -DROCKSDB_DISABLE_MARCH_NATIVE=1 \
            -DMYSQL_MAINTAINER_MODE=OFF \
            -DFORCE_INSOURCE_BUILD=1 \
+%ifarch riscv64
+	 -DCMAKE_CXX_STANDARD_LIBRARIES=-latomic \
+%endif
            -DWITH_NUMA=ON \
            -DWITH_LDAP=system \
            -DWITH_PACKAGE_FLAGS=OFF \
@@ -973,7 +983,9 @@ fi
 %attr(644, root, root) %{_mandir}/man1/comp_err.1*
 %attr(644, root, root) %{_mandir}/man1/mysql_config.1*
 %attr(755, root, root) %{_bindir}/mysql_config
+%ifarch %{multiarchs}
 %attr(755, root, root) %{_bindir}/mysql_config-%{__isa_bits}
+%endif
 %{_includedir}/mysql
 %{_datadir}/aclocal/mysql.m4
 %{_libdir}/mysql/lib%{shared_lib_pri_name}.a
@@ -1209,6 +1221,9 @@ fi
 %dir %{_sysconfdir}/my.cnf.d
 
 %changelog
+* Tue Mar 14 2023 laokz <zhangkai@iscas.ac.cn> - 8.0.25-16.7
+- add riscv64 support
+
 * Mon Feb  6 2023 GreatSQL <greatsql@greatdb.com> - 8.0.25-16.6
 - compat-openssl11-devel
 
